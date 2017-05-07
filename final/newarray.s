@@ -1,14 +1,3 @@
-
-/******************************************************************************
-* @file array.s
-* @brief simple array declaration and iteration example
-*
-* Simple example of declaring a fixed-width array and traversing over the
-* elements for printing.
-*
-* @author Christopher D. McMurrough
-******************************************************************************/
- 
 .global main
 .func main
    
@@ -23,9 +12,9 @@ writeloop:
     PUSH {R1}
     PUSH {R0}
     PUSH {R2}   
-    BL _scanf
+    BL _scanf            @branch to scanf to get the user input
     POP {R2}
-    STR R0, [R2]            @ write the address of a[i] to a[i]
+    STR R0, [R2]            @ populate the array with the scanf values
     POP {R0}
     POP {R1}
     ADD R0, R0, #1          @ increment index
@@ -52,12 +41,12 @@ readloop:
     B   readloop            @ branch to next loop iteration
 
 readdone:
-    BL _prompt                 
-    BL _scanf
-    MOV R8, R0
+    BL _prompt                 @branch to prompt to ask for the search value
+    BL _scanf                  @get the user input
+    MOV R8, R0                 @move R0 to R8 so that we can compare the value with R1
    @BL _printf1
-    MOV R0, #0
-    MOV R9, #-99
+    MOV R0, #0                
+    MOV R9, #-99             
     @BL search_value
    @B exit
 
@@ -70,8 +59,8 @@ search_value:
     ADD R2, R1, R2          @ R2 now has the element address
     LDR R1, [R2]            @ read the array at address 
     PUSH {R8}
-    CMP R1, R8
-    MOVEQ R9, #88
+    CMP R1, R8              @compare the search value with the values in the array
+    MOVEQ R9, #88         
     @BNE _prompt2
     PUSH {R0}               @ backup register before printf
     PUSH {R1}               @ backup register before printf
@@ -80,7 +69,7 @@ search_value:
     MOV R1, R0              @ move array index to R1 for printf
    @ CMP R2, R8
    @MOVEQ R9,#88
-    BLEQ _printf
+    BLEQ _printf            @prints all the values found. Note: we cannot use BEQ as it prints only the first instance found
     POP {R2}                @ restore register
     POP {R1}                @ restore register
     POP {R0}                @ restore register
@@ -89,8 +78,8 @@ search_value:
     B   search_value            @ branch to next loop iteration
 _search_complete:
    CMP R9, #-99
-   BLEQ _prompt2
-   POP {R8}      @??
+   BLEQ _prompt2            @value not found string
+   POP {R8}                 @free R8
    B _exit
 _prompt: 
     MOV R7, #4
